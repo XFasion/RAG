@@ -1,6 +1,37 @@
-.env
+# 가상환경 디렉토리
+venv/
 .venv/
-.pycache/
-.ipynb_checkpoints
-__pycache__
+
+# Python 캐시/컴파일 파일
+__pycache__/
+*.py[cod]
+
+# Jupyter 체크포인트
+.ipynb_checkpoints/
+
+# 환경 변수 파일
+.env
+
+# FAISS DB, 벡터 인덱스, 대화 저장소
+faiss_conversation_db*/
+*.faiss
+*.pkl
+*.json
+*.npy
+
+# 대용량 로컬 데이터셋 파일
+*.csv
+*.tsv
+*.jsonl
+
+# 사용자 정의 로컬 폴더
 CAG/
+
+# 로그 파일
+*.log
+
+# VSCode 설정 (선택)
+.vscode/
+
+# macOS 쓰레기파일
+.DS_Store
