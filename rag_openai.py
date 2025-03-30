@@ -1,4 +1,5 @@
-import os 
+import os
+import time
 from llama_index.core import (
     StorageContext,
     load_index_from_storage,
@@ -7,6 +8,10 @@ from llama_index.core import (
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from openai import OpenAI
 from dotenv import load_dotenv
+
+from rag_prompt import RAG_PROMPT
+from yusiyeon import CHARACTER_PROMPT 
+os.environ["TOKENIZERS_PARALLELISM"] = "false" # 병렬처리 비활성화
 
 # 환경변수 로드
 load_dotenv()
@@ -35,36 +40,36 @@ client = OpenAI(api_key=OPENAI_API_KEY)
 
 # 질문에 답하는 함수 정의
 def query_rag(question):
+    start_retrieve = time.time()
     nodes = retriever.retrieve(question)
+    retrieve_time = time.time() - start_retrieve
+ 
     knowledge = "\n".join(node.text for node in nodes)
 
     print("\n✅ 검색된 문서:\n", knowledge)
+    print(f"\n⏱️ 검색(retrieve) 소요시간: {retrieve_time:.4f} 초")
 
-    prompt = f"""
-    다음 대화를 참고하여 질문에 간단히 답해주세요. 모르면 '정보 없음'이라고 답하세요.
-
-    대화: {knowledge}
-
-    질문: {question}
-    답변:
-    """
+    prompt = RAG_PROMPT.format(
+        character_prompt=CHARACTER_PROMPT,
+        related_conversations=knowledge,
+        user_question=question
+    )
+    start_llm = time.time()
 
     response = client.chat.completions.create(
         model="gpt-4o",
         messages=[{"role": "user", "content": prompt}],
-        max_tokens=200,
-        temperature=0
+        max_tokens=800,
+        temperature=0.8
     )
+    llm_time = time.time() - start_llm
+    print(f"⏱️ LLM 응답 생성 소요시간: {llm_time:.4f} 초")
 
     return response.choices[0].message.content.strip()
 
 # 질문 테스트
 questions = [
-    "사용자가 무서워하는 동물은 무엇인가요?",
-    "사용자가 좋아하는 영화 장르는 무엇인가요?",
-    "사용자가 싫어하는 음식은 무엇인가요?",
-    "사용자가 두려워하는 것은 무엇인가요?",
-    "사용자가 매운 음식을 잘 먹나요?"
+    "너 동물 무섭다고 난리 쳤었잖아 그때 기억나?"
 ]
 
 for question in questions:
