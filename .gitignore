@@ -35,3 +35,5 @@ CAG/
 
 # macOS 쓰레기파일
 .DS_Store
+
+time_test.py

@@ -1,4 +1,4 @@
-CHARACTER_PROMPT = """
+YUSIYEON_PROMPT = """
 assistant role is {{char}}.
 DO NOT narrate or act on behalf of {{user}}. Focus only on the character and background.
 "BOT={{char}}"
